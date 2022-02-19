@@ -1,9 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
+import { useState } from "react";
 import MapView from 'react-native-maps';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Alert } from 'react-native';
 
-export default function App() {
+const App = () => {
   return (
     <View style={styles.container}>
       <MapView style={styles.map} />
@@ -23,4 +23,6 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').height,
   },
 });
+
+export default App;
 

@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { useState, useEffect } from "react";
 import MapView from 'react-native-maps';
-import { StyleSheet, View, Dimensions, Alert, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, Dimensions, Alert, ActivityIndicator, TouchableOpacity, Text, } from 'react-native';
 import * as Location from 'expo-location';
 import MapViewDirections from 'react-native-maps-directions';
 import Geocoder from 'react-native-geocoding';
+import DialogInput from "react-native-dialog-input";
 
 Geocoder.init("AIzaSyABSrEMbXv69aQ5IczL3ZzBbnDBAGo-1bs");
 
@@ -15,6 +16,8 @@ export default function App () {
   const [park, setPark] = useState({lat: 0, lng: 0});
   const [parkName, setName] = useState(" ")
   const [state, setState] = useState({isReady: false},);
+  const [input, setInput] = useState("Simon Fraser University");
+  const [visible, setVisible] = useState(false);
 
   const createThreeButtonAlert = () =>
     Alert.alert('Go Touch Grass!', 'You Have Been Home For Too Long! Go Visit The Outdoors!', [
@@ -29,13 +32,36 @@ export default function App () {
       },
       { text: 'OK', onPress: () => console.log('OK Pressed') },
     ]);
+
   async function setHome() {
     let location = await Location.getCurrentPositionAsync({});
     setLat(location.coords.latitude);
     setLng(location.coords.longitude);
   };
 
+  async function changePark() {
+    setState({isReady: false});
+    setPark({latitude: 0, longitude: 0});
+    Geocoder.from(input)
+        .then(json => {
+        let park = json.results[0].geometry.location;
+        let parkName = json.results[0].address_components.long_name;
+        setPark(park);
+        setName(parkName);
+        if (visible) {
+            setVisible(false);
+        }
+        setState({isReady: true});
+        })
+        .catch(error => console.warn(error));
+  };
+
+  const showDialog = () => {
+    setVisible(true);
+  };
+
   async function loadData() {
+    setState({isReady: false});
     let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('Permission to access location was denied');
@@ -46,34 +72,19 @@ export default function App () {
       let lng = location.coords.longitude;
       setLat(lat);
       setLng(lng);
-      Geocoder.from("Simon Fraser University")
-      .then(json => {
-        let park = json.results[0].geometry.location;
-        let parkName = json.results[0].address_components.long_name;
-        setPark(park);
-        setName(parkName);
-        setState({isReady: true});
-      })
-      .catch(error => console.warn(error));
+      changePark();
   };
+
+  async function submitDialog(inputText) {
+    setInput(inputText);
+    setPark({latitude: 0, longitude: 0});
+    changePark();
+    setVisible(false);
+  }
   
   useEffect(() => {
     loadData();
   }, []);
-  
-  const coords = [
-    {
-      latitude: lat, 
-      longitude: lng,
-    },
-    {
-      latitude: park.lat, 
-      longitude: park.lng,
-    },
-  ];
-
-  console.log(coords);
-  console.log(state);
 
   if (!state.isReady) {
     return (
@@ -99,17 +110,16 @@ export default function App () {
         }}
       >
         <MapView.Marker
-              coordinate={coords[1]}
+              coordinate={{latitude: park.lat, longitude: park.lng}}
               title={parkName}
               description={"Somewhere with grass!"}
           />
           <MapViewDirections
-            origin={coords[0]}
-            destination={coords[1]}
+            origin={{latitude: lat, longitude: lng}}
+            destination={{latitude: park.lat, longitude: park.lng}}
             apikey={"AIzaSyABSrEMbXv69aQ5IczL3ZzBbnDBAGo-1bs"}
             strokeWidth={5}
             strokeColor="blue"
-            resetOnChange={true}
           />
       </MapView>
       <View style={styles.button_container}>
@@ -119,6 +129,18 @@ export default function App () {
         <TouchableOpacity style = {styles.button2} onPress={createThreeButtonAlert}>
           <Text style={styles.text}>Test Alert</Text>
         </TouchableOpacity>
+        <TouchableOpacity style = {styles.button3} onPress={showDialog}>
+                  <Text style={styles.text}>Set Park</Text>
+        </TouchableOpacity>
+      </View>
+      <View>
+        <DialogInput isDialogVisible={visible}
+                    title={"SunShy"}
+                    message={"Please Enter A Destination:"}
+                    hintInput ={"Try The Name Of A Nearby Park"}
+                    submitInput={ (inputText) => {submitDialog(inputText)}}
+                    closeDialog={ () => {setVisible(false)}}>
+        </DialogInput>
       </View>
     </View>
   );
@@ -171,6 +193,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: 'white',
   },
+  button3: {
+      position: 'absolute',
+      bottom: 10,
+      marginRight: 0,
+      marginLeft: 10,
+      marginTop: 10,
+      paddingTop: 10,
+      paddingBottom: 10,
+      backgroundColor: '#94B49F',
+      borderRadius: 10,
+      borderColor: 'white',
+    },
   text: {
     color:'#E5E3C9',
     textAlign:'center',

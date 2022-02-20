@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from "react";
 import MapView from 'react-native-maps';
-import { StyleSheet, View, Dimensions, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Dimensions, Alert, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
 import * as Location from 'expo-location';
 import MapViewDirections from 'react-native-maps-directions';
 import Geocoder from 'react-native-geocoding';
@@ -16,6 +16,25 @@ export default function App () {
   const [parkName, setName] = useState(" ")
   const [state, setState] = useState({isReady: false},);
 
+  const createThreeButtonAlert = () =>
+    Alert.alert('Go Touch Grass!', 'You Have Been Home For Too Long! Go Visit The Outdoors!', [
+      {
+        text: 'Ask me later',
+        onPress: () => console.log('Ask me later pressed'),
+      },
+      {
+        text: 'Busy Right Now',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      { text: 'OK', onPress: () => console.log('OK Pressed') },
+    ]);
+  async function setHome() {
+    let location = await Location.getCurrentPositionAsync({});
+    setLat(location.coords.latitude);
+    setLng(location.coords.longitude);
+  };
+
   async function loadData() {
     let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -27,7 +46,7 @@ export default function App () {
       let lng = location.coords.longitude;
       setLat(lat);
       setLng(lng);
-      Geocoder.from("Stanely Park")
+      Geocoder.from("Simon Fraser University")
       .then(json => {
         let park = json.results[0].geometry.location;
         let parkName = json.results[0].address_components.long_name;
@@ -58,12 +77,12 @@ export default function App () {
 
   if (!state.isReady) {
     return (
-      <View style={[styles.container]}>
+      <View style={[styles.loading_container]}>
         <ActivityIndicator size="small" />
       </View>
     ); }
   return (
-    <View style={styles.loading_container}>
+    <View style={styles.container}>
       <MapView 
         style={styles.map}
         showsUserLocation={true}
@@ -85,7 +104,6 @@ export default function App () {
               description={"Somewhere with grass!"}
           />
           <MapViewDirections
-            id="line"
             origin={coords[0]}
             destination={coords[1]}
             apikey={"AIzaSyABSrEMbXv69aQ5IczL3ZzBbnDBAGo-1bs"}
@@ -94,6 +112,14 @@ export default function App () {
             resetOnChange={true}
           />
       </MapView>
+      <View style={styles.button_container}>
+        <TouchableOpacity style = {styles.button1} onPress={setHome}>
+          <Text style={styles.text}>Set Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style = {styles.button2} onPress={createThreeButtonAlert}>
+          <Text style={styles.text}>Test Alert</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -101,9 +127,8 @@ export default function App () {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#E5E3C9',
   },
   loading_container: {
     flex: 1,
@@ -111,6 +136,45 @@ const styles = StyleSheet.create({
   },
   map: {
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    height: '90%',
+  },
+  button_container: {
+    flex: 1,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#B4CFB0',
+  },
+  button1: {
+    position: 'absolute',
+    right: 0,
+    bottom: 10,
+    marginRight: 10,
+    marginLeft: 0,
+    marginTop: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backgroundColor: '#94B49F',
+    borderRadius: 10,
+    borderColor: 'white',
+  },
+  button2: {
+    position: 'absolute',
+    left: 0,
+    bottom: 10,
+    marginRight: 0,
+    marginLeft: 10,
+    marginTop: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backgroundColor: '#94B49F',
+    borderRadius: 10,
+    borderColor: 'white',
+  },
+  text: {
+    color:'#E5E3C9',
+    textAlign:'center',
+    paddingLeft : 10,
+    paddingRight : 10
   },
 });

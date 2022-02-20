@@ -20,7 +20,7 @@ export default function App () {
   const [visible, setVisible] = useState(false);
 
   const createThreeButtonAlert = () =>
-    Alert.alert('Go Touch Grass!', 'You Have Been Home For Too Long! Go Visit The Outdoors!', [
+    Alert.alert('Go Touch Grass!', 'You have been home for too long! Go visit the outdoors!', [
       {
         text: 'Ask me later',
         onPress: () => console.log('Ask me later pressed'),
@@ -30,7 +30,7 @@ export default function App () {
         onPress: () => console.log('Cancel Pressed'),
         style: 'cancel',
       },
-      { text: 'OK', onPress: () => console.log('OK Pressed') },
+      { text: 'OK', onPress: showDialog },
     ]);
 
   async function setHome() {
@@ -96,6 +96,7 @@ export default function App () {
     <View style={styles.container}>
       <MapView 
         style={styles.map}
+        scrollEnabled={true}
         showsUserLocation={true}
         followsUserLocation={true}
         initialCamera={{

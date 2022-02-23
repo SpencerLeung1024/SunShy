@@ -3,6 +3,11 @@ Mobile app to remind you to go outside.
 
 Built using Expo and React Native.
 
+This is a fork of the original [SunShy](https://github.com/Simon7896/SunShy) created for StormHacks 2022. The following people contributed to it:
+- [Simon7896](https://github.com/Simon7896)
+- [brianle125](https://github.com/brianle125)
+- [aryanjand](https://github.com/aryanjand)
+
 ## Setup
 Note: These steps were done on a 64-bit Windows machine and run the app in an Android emulator. Different operating systems or using a physical iOS or Android device may require different steps.
 
@@ -24,11 +29,11 @@ Expect installing NodeJS and Android Studio to take a few GBs of storage and the
 7. Install and set up [Android Studio](https://developer.android.com/studio) for the included Android emulator
 8. Android Studio Main Menu > More Actions > Virtual Device Manager
 9. Device Manager > Create Device > (use default settings; a Pixel 2 API 30 was used during testing)
-10. Click the down arrow beside the newly created Android Vritual Device, then click "Show on Disk"
+10. Click the down arrow beside the newly created Android Virtual Device, then click "Show on Disk"
 11. Remember the name of the folder (the testing example would be `Pixel_2_API_30.avd`)
 12. Navigate to `C:\Users\<your username>\AppData\Local\Android\Sdk\emulator`
-13. `emulator -avd <folder name without .avd>` (the testing example would be `emulator -avd Pixel_2_API_30`)
-14. While the Android Virtual Device is running, navigate to this repository
+13. `.\emulator -avd <folder name without .avd>` (the testing example would be `.\emulator -avd Pixel_2_API_30`)
+14. While the Android Virtual Device is running, open a new PowerShell and navigate to this repository
 15. `expo start`
 16. When prompted to "Press a │ open Android", press `a`
 
